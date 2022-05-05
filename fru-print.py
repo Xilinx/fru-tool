@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# Copyright (C) 2020 - 2022 Xilinx, Inc.  All rights reserved.
+# SPDX-License-Identifier: MIT
+
 import argparse, yaml, sys
 from glob import glob
 from fru import load
