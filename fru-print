@@ -12,6 +12,7 @@ parser.add_argument('-b','--board', action='store', choices=['som','cc'], type=s
 parser.add_argument('-f','--field', action='store', nargs="+", type=str, help='enter fields to index using. (if entering one arg, it\'s assumed the field is from board area)')
 parser.add_argument('-s','--sompath', type=str, nargs="?", default='/sys/bus/i2c/devices/*50/eeprom', help='enter path to SOM EEPROM')
 parser.add_argument('-c','--ccpath', type=str, nargs="?", default='/sys/bus/i2c/devices/*51/eeprom', help='enter path to CC EEPROM')
+parser.add_argument('-d','--device', type=str, nargs="?", default='', help='enter path to EEPROM device e.g. /sys/bus/i2c/devices/1-0050/eeprom')
 args = parser.parse_args()
 
 if args.board == 'som':
@@ -32,18 +33,33 @@ else:
     except:
         sys.exit('\nOne of the following paths is wrong:\nsom path: ' + args.sompath + '\n' + 'cc path: ' + args.ccpath)
 
-if args.field and args.board is None:
-    parser.error('\nIf entering a field, need board input as well')
+if args.device:
+    try:
+        device=glob(args.device)[0]
+    except:
+        sys.exit('\ndevice path is incorrect: ' + args.device)
+
+if args.field and args.board is None and args.device is None:
+    parser.error('\nIf entering a field, need board or device input as well')
 
 elif args.board and args.field is None:
     print(yaml.dump(load(eval(args.board)), default_flow_style=False, allow_unicode=True))
 
-elif args.board and args.field:
+elif args.device and args.field is None:
+    print(yaml.dump(load(device), default_flow_style=False, allow_unicode=True))
+
+elif (args.board or args.device) and args.field:
     try:
         if len(args.field) == 1:
-            print(load(eval(args.board))['board'][args.field[0]])
+            if args.board:
+                print(load(eval(args.board))['board'][args.field[0]])
+            elif args.device:
+                print(load(args.device)['board'][args.field[0]])
         else:
-            data = load(eval(args.board))
+            if args.board:
+                data = load(eval(args.board))
+            elif args.device:
+                data = load(args.device)
             for field in args.field:
                 data = data[field]
             print(data)
