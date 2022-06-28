@@ -15,7 +15,13 @@ parser.add_argument('-c','--ccpath', type=str, nargs="?", default='/sys/bus/i2c/
 parser.add_argument('-d','--device', type=str, nargs="?", default='', help='enter path to EEPROM device e.g. /sys/bus/i2c/devices/1-0050/eeprom')
 args = parser.parse_args()
 
-if args.board == 'som':
+if args.device:
+    try:
+        device=glob(args.device)[0]
+    except:
+        sys.exit('\ndevice path is incorrect: ' + args.device)
+
+elif args.board == 'som':
     try:
         som=glob(args.sompath)[0]
     except:
@@ -32,12 +38,6 @@ else:
         cc=glob(args.ccpath)[0]
     except:
         sys.exit('\nOne of the following paths is wrong:\nsom path: ' + args.sompath + '\n' + 'cc path: ' + args.ccpath)
-
-if args.device:
-    try:
-        device=glob(args.device)[0]
-    except:
-        sys.exit('\ndevice path is incorrect: ' + args.device)
 
 if args.field and args.board is None and args.device is None:
     parser.error('\nIf entering a field, need board or device input as well')
