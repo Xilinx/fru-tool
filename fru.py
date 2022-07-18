@@ -228,13 +228,14 @@ def load(path=None, blob=None):
         data['board'].update(extract_values(blob, board_offset + 6, names))
         #as per xilinx spec, pcieinfo is split up with four different fields with each being 2 bytes (vendor, device, subvendor, subdevice)
         #pcie info also expected to be displayed in hex
-        temp  = data['board']['pcieinfo']
-        data['board']['pcieinfo'] = { \
-            'Vendor_ID':temp[0:4], \
-            'Device_ID':temp[4:8], \
-            'SubVendor_ID':temp[8:12], \
-            'SubDevice_ID':temp[12:16] \
-        }
+        if 'pcieinfo' in data['board']:
+            temp  = data['board']['pcieinfo']
+            data['board']['pcieinfo'] = { \
+                'Vendor_ID':temp[0:4], \
+                'Device_ID':temp[4:8], \
+                'SubVendor_ID':temp[8:12], \
+                'SubDevice_ID':temp[12:16] \
+            }
 
     if multirecord_offset:
         if blob[multirecord_offset:multirecord_offset+1] == b'\x02':
