@@ -43,10 +43,16 @@ if args.field and args.board is None and args.device is None:
     parser.error('\nIf entering a field, need board or device input as well')
 
 elif args.board and args.field is None:
-    print(yaml.dump(load(eval(args.board)), default_flow_style=False, allow_unicode=True))
+    try:
+        print(yaml.dump(load(eval(args.board)), default_flow_style=False, allow_unicode=True))
+    except ValueError:
+        print("ERROR: Malformed FRU data\n")
 
 elif args.device and args.field is None:
-    print(yaml.dump(load(device), default_flow_style=False, allow_unicode=True))
+    try:
+        print(yaml.dump(load(device), default_flow_style=False, allow_unicode=True))
+    except ValueError:
+        print("ERROR: Malformed FRU data\n")
 
 elif (args.board or args.device) and args.field:
     try:
@@ -63,6 +69,8 @@ elif (args.board or args.device) and args.field:
             for field in args.field:
                 data = data[field]
             print(data)
+    except ValueError:
+        print("ERROR: Malformed FRU data\n")
     except KeyError:
         print("ERROR: "+str(args.field)+" is not a valid input for field.\nmultiple key values can be provided to the field arg, ex. -f multirecord DC_Load_Record max_V\n\
 If just one value is given, it is assumed the field is under the board area.\n")
